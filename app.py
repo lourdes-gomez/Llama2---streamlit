@@ -3,6 +3,9 @@
 import streamlit as st
 import replicate
 import os
+import requests
+from PIL import Image
+from io import BytesIO
 
 # App title
 st.set_page_config(page_title="🦙💬 Llama 2 Chatbot")
@@ -76,8 +79,9 @@ def generate_stable_response(prompt_input):
     output = replicate.run("stability-ai/stable-diffusion:ac732df83cea7fff18b8472768c88ad041fa750ff7682a21affe81863cbe77e4", 
                              input={"width": 768, "height": 768, "prompt": "an astronaut riding a horse on mars, hd, dramatic lighting", "scheduler": "K_EULER",
                               "num_outputs": 1, "guidance_scale": 7.5, "num_inference_steps": 50 , "num_inference_steps": 50  } )
-    
-    return output
+    output = requests.get(output)
+    imagen = Image.open(BytesIO(output.content))
+    return imagen
 
 
 
