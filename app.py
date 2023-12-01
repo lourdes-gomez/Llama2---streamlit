@@ -93,7 +93,10 @@ if prompt := st.chat_input(disabled=not replicate_api):
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            response = generate_llama2_response(prompt)
+            if selected_model == 'Llama2-7B' or selected_model == 'Llama2-13B' :
+                response = generate_llama2_response(prompt)
+            elif selected_model == 'Stable-diffusion':
+                response = generate_stable_response(prompt)
             placeholder = st.empty()
             full_response = ''
             for item in response:
