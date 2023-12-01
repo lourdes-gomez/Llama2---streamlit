@@ -92,7 +92,7 @@ def generate_diff_response(prompt_input):
 
 # Generate a new response if last message is not from assistant
 if st.session_state.messages[-1]["role"] != "assistant":
-        if selected_model == 'Stable-Diffusion':
+        if selected_model == 'Stable-diffusion':
             with st.chat_message("assistant"):
                 with st.spinner("Drawing..."):
                     response = generate_diff_response(prompt)
