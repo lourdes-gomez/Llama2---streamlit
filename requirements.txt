@@ -1,2 +1,7 @@
 streamlit
 replicate
+requests
+PIL 
+Image
+io 
+BytesIO
