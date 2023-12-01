@@ -92,22 +92,27 @@ def generate_diff_response(prompt_input):
 
 # Generate a new response if last message is not from assistant
 if st.session_state.messages[-1]["role"] != "assistant":
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            if selected_model == 'Llama2-7B' or selected_model == 'Llama2-13B' :
-                response = generate_llama2_response(prompt)
-            elif selected_model == 'Stable-diffusion':
-                url = generate_diff_response(prompt)
-                response = requests.get(url)
-                if response.status_code == 200:
-                # Abrir la imagen desde los datos binarios en memoria
-                    image = Image.open(BytesIO(response.content))
+        if selected_model == 'Stable-Diffusion':
+            with st.chat_message("assistant"):
+                with st.spinner("Drawing..."):
+                    response = generate_diff_response(prompt)
+                    # Obtener la imagen de la URL
+                    response = requests.get(response)
+                    if response.status_code == 200:
+                        # Abrir la imagen desde los datos binarios en memoria
+                        image = Image.open(BytesIO(response.content))
+                        st.image(image) 
+                   
 
-            placeholder = st.empty()
-            full_response = ''
-            for item in response:
-                full_response += item
-                placeholder.markdown(full_response)
-            placeholder.markdown(full_response)
-    message = {"role": "assistant", "content": full_response}
-    st.session_state.messages.append(message)
+        else:
+            with st.chat_message("assistant"):
+                with st.spinner("Thinking..."):
+                    response = generate_llama2_response(prompt)
+                    placeholder = st.empty()
+                    full_response = ''
+                    for item in response:
+                        full_response += item
+                        placeholder.markdown(full_response)
+                    placeholder.markdown(full_response)
+            message = {"role": "assistant", "content": full_response}
+            st.session_state.messages.append(message)
