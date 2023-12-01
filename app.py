@@ -80,8 +80,8 @@ def generate_stable_response(prompt_input):
                              input={"width": 768, "height": 768, "prompt": "an astronaut riding a horse on mars, hd, dramatic lighting", "scheduler": "K_EULER",
                               "num_outputs": 1, "guidance_scale": 7.5, "num_inference_steps": 50 , "num_inference_steps": 50  } )
     output = requests.get(output)
-
-    return Image.open(BytesIO(output.content))
+    output = Image.open(BytesIO(output.content))
+    return str(output).replace('[','').replace(']','').replace("'","")
 
 
 
