@@ -86,7 +86,7 @@ def generate_diff_response(prompt_input):
         
     return str(output).replace('[','').replace(']','').replace("'","")
 
-url = generate_diff_response(prompt)
+
 
 
 
@@ -97,6 +97,7 @@ if st.session_state.messages[-1]["role"] != "assistant":
             if selected_model == 'Llama2-7B' or selected_model == 'Llama2-13B' :
                 response = generate_llama2_response(prompt)
             elif selected_model == 'Stable-diffusion':
+                url = generate_diff_response(prompt)
                 response = requests.get(url)
                 if response.status_code == 200:
                 # Abrir la imagen desde los datos binarios en memoria
