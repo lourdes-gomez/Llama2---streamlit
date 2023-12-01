@@ -7,6 +7,7 @@ import requests
 from PIL import Image
 from io import BytesIO
 
+
 # App title
 st.set_page_config(page_title="🦙💬 Llama 2 Chatbot")
 
@@ -69,21 +70,6 @@ def generate_llama2_response(prompt_input):
                                   "temperature":temperature, "top_p":top_p, "max_length":max_length, "repetition_penalty":1})
     return output
 
-def generate_stable_response(prompt_input):
-    string_dialogue = "You are a helpful assistant. You do not respond as 'User' or pretend to be 'User'. You only respond once as 'Assistant'."
-    for dict_message in st.session_state.messages:
-        if dict_message["role"] == "user":
-            string_dialogue += "User: " + dict_message["content"] + "\n\n"
-        else:
-            string_dialogue += "Assistant: " + dict_message["content"] + "\n\n"
-    output = replicate.run("stability-ai/stable-diffusion:ac732df83cea7fff18b8472768c88ad041fa750ff7682a21affe81863cbe77e4", 
-                             input= {"prompt": prompt_input}) 
-    output = requests.get(output)
-    output = Image.open(BytesIO(output.content))
-    return str(output).replace('[','').replace(']','').replace("'","")
-
-
-
 
 
 # User-provided prompt
@@ -92,6 +78,18 @@ if prompt := st.chat_input(disabled=not replicate_api):
     with st.chat_message("user"):
         st.write(prompt)
 
+
+def generate_diff_response(prompt_input):
+    output = replicate.run(
+        "stability-ai/stable-diffusion:ac732df83cea7fff18b8472768c88ad041fa750ff7682a21affe81863cbe77e4",
+        input={"prompt": prompt_input})
+        
+    return str(output).replace('[','').replace(']','').replace("'","")
+
+url = generate_diff_response(prompt)
+
+
+
 # Generate a new response if last message is not from assistant
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
@@ -99,7 +97,11 @@ if st.session_state.messages[-1]["role"] != "assistant":
             if selected_model == 'Llama2-7B' or selected_model == 'Llama2-13B' :
                 response = generate_llama2_response(prompt)
             elif selected_model == 'Stable-diffusion':
-                response = generate_stable_response(prompt)
+                response = requests.get(url)
+                if response.status_code == 200:
+                # Abrir la imagen desde los datos binarios en memoria
+                    image = Image.open(BytesIO(response.content))
+
             placeholder = st.empty()
             full_response = ''
             for item in response:
